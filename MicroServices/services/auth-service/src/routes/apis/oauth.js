@@ -5,7 +5,6 @@ const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const generateCode = require('../../utils/generateCode');
-const auth = require('../../middlewares/auth');
 require('dotenv').config();
 
 server.serializeClient((client, done) => done(null, client.clientId));
@@ -24,7 +23,7 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, code, r
         return done(null, false);
     }
     const payload = {
-        userId: client.profileId,
+        userId: client.userAccountId,
         clientId: client.clientId,
     };
     const tokenValue = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -39,7 +38,7 @@ router.post('/oauth/token', passport.authenticate(['basic', 'oauth2-client-passw
 );
 
 
-router.post('/register-client', passport.authenticate('local', { session: false }), async (req, res) => {
+router.post('/register-client', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
         const { name, redirectUri } = req.body;
         const clientId = generateCode();
@@ -49,7 +48,7 @@ router.post('/register-client', passport.authenticate('local', { session: false 
             name,
             clientId,
             clientSecret,
-            profileId: req.user._id, // Link client to the authenticated user
+            userAccountId: req.user._id, // Link client to the authenticated user
             redirectUris: [redirectUri],
             grants: ['client_credentials'] // Depending on what you want to allow
         });

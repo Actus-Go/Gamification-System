@@ -1,29 +1,11 @@
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const Profile = require('../models/Profile');
+const UserAccount = require('../models/UserAccount');
 const ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 const BasicStrategy = require('passport-http').BasicStrategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const Client = require('../models/Client');
 require('dotenv').config();
-
-passport.use(
-    new LocalStrategy(
-        async function (username, password, cb) {
-            console.log(username)
-            const profile = await Profile.findOne({ username: username });
-            if (!profile) {
-                return cb(null, false, { message: 'Incorrect username or password.' });
-            }
-            if (!profile.validatePassword(password)) {
-                return cb(null, false, { message: 'Incorrect username or password.' });
-            }
-            return cb(null, profile);
-
-        }
-    )
-);
 
 
 passport.use(new ClientPasswordStrategy(
@@ -45,17 +27,31 @@ opts.secretOrKey = process.env.JWT_SECRET;
 
 passport.use(
     new JwtStrategy(opts, (payload, done) => {
-        Client.findOne({ clientId: payload.clientId })
-            .then(client => {
-                if (client) {
-                    return done(null, client);
-                }
+        if (payload.userAccountId) {
+            UserAccount.findById(payload.userAccountId)
+                .then(userAccount => {
+                    if (userAccount) {
+                        return done(null, userAccount);
+                    }
 
-                return done(null, false);
-            })
-            .catch(err => {
-                return done(err, false);
-            });
+                    return done(null, false);
+                })
+                .catch(err => {
+                    return done(err, false);
+                });
+        } else {
+            Client.findOne({ clientId: payload.clientId })
+                .then(client => {
+                    if (client) {
+                        return done(null, client);
+                    }
+
+                    return done(null, false);
+                })
+                .catch(err => {
+                    return done(err, false);
+                });
+        }
     })
 );
 

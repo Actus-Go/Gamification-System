@@ -2,10 +2,13 @@
   "name": "gamification-microservice",
   "version": "1.0.0",
   "description": "Provides a unified API interface for the various services",
-  "main": "index.js",
+  "main": "common/api-proxy/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "create-superuser": "node createSuperuser.js"
+    "create-superuser": "node createSuperuser.js",
+    "main-service": "nodemon ./common/api-proxy/index.js",
+    "auth-service": "nodemon ./services/auth-service/src/index.js",
+    "points-service": "nodemon ./services/points-service/src/index.js"
   },
   "author": "Ahmed Shrief",
   "license": "ISC",
@@ -15,6 +18,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "gamification-microservice": "file:",
+    "http-proxy-middleware": "^3.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "nodemon": "^3.1.4",
@@ -22,7 +26,6 @@
     "passport": "^0.7.0",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
     "passport-oauth2-client-password": "^0.1.2",
     "readline-sync": "^1.4.10"
   }

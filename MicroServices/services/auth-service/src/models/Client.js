@@ -9,9 +9,9 @@ const ClientSchema = new Schema({
         type: String,
         unique: true
     },
-    profileId: {
+    userAccountId: {
         type: Schema.Types.ObjectId,
-        ref: 'Profile'
+        ref: 'UserAccount'
     },
     redirectUris: [String],
     grants: [String]

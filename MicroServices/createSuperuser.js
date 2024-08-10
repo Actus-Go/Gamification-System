@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const readlineSync = require('readline-sync');
-const Profile = require('./models/Profile');
-const setupDB = require('./utils/db');
-const { ROLES } = require('./constants');
+const UserAccount = require('./services/auth-service/src/models/UserAccount');
+const setupDB = require('./common/api-proxy/src/utils/db');
+const { ROLES } = require('./common/constants');
 
 
 async function createSuperuser() {
@@ -13,15 +13,15 @@ async function createSuperuser() {
             hideEchoBack: true
         });
 
-        const exists = await Profile.findOne({ username });
+        const exists = await UserAccount.findOne({ username });
         if (exists) {
             console.log('Error: A user with that username or email already exists.');
             return;
         }
 
-        const adminProfile = new Profile({ username, password, role: ROLES.Admin });
-        adminProfile.setPassword(password);
-        await adminProfile.save();
+        const adminUserAccount = new UserAccount({ username, password, role: ROLES.Admin });
+        adminUserAccount.setPassword(password);
+        await adminUserAccount.save();
 
         console.log('Superuser created successfully!');
     } catch (error) {

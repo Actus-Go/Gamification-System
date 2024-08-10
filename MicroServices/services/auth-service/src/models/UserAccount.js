@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const crypto = require('crypto');
-const { ROLES } = require('../constants');
+const { ROLES } = require('../../../../common/constants');
 require('dotenv').config();
 const salt = process.env.SALT;
 
-const ProfileSchema = new Schema({
+const UserAccountSchema = new Schema({
     username: {
         type: String,
         unique: true
@@ -26,17 +26,17 @@ const ProfileSchema = new Schema({
 
 
 // Method for setting a user's hashed password and salt
-ProfileSchema.methods.setPassword = function (password) {
+UserAccountSchema.methods.setPassword = function (password) {
     this.password = crypto.pbkdf2Sync(password, salt, 310000, 32, 'sha256').toString('hex');
 };
 
 // Method for validating a user's password
-ProfileSchema.methods.validatePassword = function (password) {
+UserAccountSchema.methods.validatePassword = function (password) {
     const hashedPassword = crypto.pbkdf2Sync(password, salt, 310000, 32, 'sha256').toString('hex');
     return this.password === hashedPassword;
 };
 
 
-const Profile = mongoose.model('Profile', ProfileSchema);
+const UserAccount = mongoose.model('UserAccount', UserAccountSchema);
 
-module.exports = Profile;
+module.exports = UserAccount;
