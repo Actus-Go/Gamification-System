@@ -12,8 +12,8 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ message: "You must enter username and passowrd" });
     }
     const userAccount = await UserAccount.findOne({ username: username });
-    if (!userAccount) {
-        return res.status(400).json({ message: "This UserAccount does not exists" });
+    if (!userAccount || !userAccount.validatePassword(password)) {
+        return res.status(400).json({ message: "Check your creds" });
     }
     const payload = {
         userAccountId: userAccount._id,

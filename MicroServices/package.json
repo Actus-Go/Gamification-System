@@ -6,12 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-superuser": "node createSuperuser.js",
-    "main-service": "nodemon ./common/api-proxy/index.js",
+    "main-service": "nodemon ./common/api-proxy/src/index.js",
     "auth-service": "nodemon ./services/auth-service/src/index.js",
     "points-service": "nodemon ./services/points-service/src/index.js"
   },
   "author": "Ahmed Shrief",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "chalk": "^2.4.2",
     "cors": "^2.8.5",
