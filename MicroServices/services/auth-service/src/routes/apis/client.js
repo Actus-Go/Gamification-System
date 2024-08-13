@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { clientModel, trackerModel } = require('../../template/model');
 const auth = require('../../../../../common/api-proxy/src/middlewares/auth');
+const { ROLES } = require('../../../../../common/constants');
 
 router.post('/register-client', auth, async (req, res) => {
     try {
@@ -80,6 +81,91 @@ router.post('/add-users', auth, async (req, res) => {
         console.log(error);
         res.status(500).json({ message: 'Error registering client.' });
 
+    }
+});
+
+/**
+ * @desc:   Update a client by id
+ * @route:  PUT /auth/api/client
+ * @access: Private
+ */
+
+router.put('/:id', auth, async (req, res) => {
+    const { id } = req.params;
+    const { name, clientId, clientSecret, redirectUris } = req.body;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role ==  ROLES.Admin || client.userAccountId == req.user._id) {
+            if (name !== undefined) client.name = name;
+            if (clientId !== undefined) client.clientId = clientId;
+            if (clientSecret !== undefined) client.clientSecret = clientSecret;
+            if (redirectUris !== undefined) client.redirectUris = redirectUris;
+
+            await client.save();
+
+            return res.status(200).json({
+                id: client._id,
+                name: client.name,
+                clientId: client.clientId,
+                clientSecret: client.clientSecret,
+                redirectUris: client.redirectUris,
+                userAccountId: client.userAccountId,
+            });
+        }
+
+        res.status(403).json({
+            message: 'This client belongs to another user so you cannot update it.'
+        });
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while updating the client.'
+        });
+    }
+});
+
+/**
+ * @desc:   Delete a client by id
+ * @route:  DELETE /auth/api/client
+ * @access: Private
+ */
+
+router.delete('/:id', auth, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role ==  ROLES.Admin || client.userAccountId == req.user._id) {
+            await client.deleteOne();
+
+            return res.status(204).send();
+        }
+
+        res.status(403).json({
+            message: 'This client belongs to another user so you cannot delete it.'
+        });
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while deleting the client.'
+        });
     }
 });
 
