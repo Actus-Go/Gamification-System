@@ -1,0 +1,241 @@
+{
+	"info": {
+		"_postman_id": "dda36b38-d3f0-4d08-a4e5-1eca8af191b9",
+		"name": "Gamification",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27558297"
+	},
+	"item": [
+		{
+			"name": "Register User",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyQWNjb3VudElkIjoiNjZiNzFiZDNjYzNmMTc1ZDYzMTQ5NGE4IiwiaWF0IjoxNzIzMjc2NTc4LCJleHAiOjE3MjMyODAxNzh9.anxjREO91m0l1rY9dm8SBPnA1q2vXaB35_JJ6BSKDv4",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"moha\",\r\n    \"password\": \"As123456789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/auth/api/user-account/register",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"api",
+						"user-account",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Client",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyQWNjb3VudElkIjoiNjZiNzFiZDNjYzNmMTc1ZDYzMTQ5NGE4IiwiaWF0IjoxNzIzNDIwNzQzLCJleHAiOjE3MjM0MjQzNDN9.wmO3HJuY2YK7kbButMPJi-h5OqBIfoC5ZdQq90MHs2g",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"ActusMarket\",\r\n    \"redirectUri\": \"13245\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/auth/api/client/register-client",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"api",
+						"client",
+						"register-client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Token to access resources",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "5bfeac7e75a99da66d82ae78459d3b5af7dd268d44d6d47f65c9df22602ae9245daafed5a4b0794276cf6e8937ff819e818f9e8f6502af95d9c988c999dae0dc3d537c7b0198",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "fdba1eaf348045a1cb39a9984160b140e5e0ad63e4e20aea52ef9170c34793d8c34e2f74463aa89ed4e1e950ffa0847be6e44d613ec1998d174bd178cf0104e1726162552332",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/auth/oauth/token",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"oauth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as a user to get token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"ahmed shrief\",\r\n    \"password\": \"As123456789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/auth/api/user-account/login",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"api",
+						"user-account",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Users for a specific client",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmI3MWJkM2NjM2YxNzVkNjMxNDk0YTgiLCJjbGllbnRJZCI6ImZkYmExZWFmMzQ4MDQ1YTFjYjM5YTk5ODQxNjBiMTQwZTVlMGFkNjNlNGUyMGFlYTUyZWY5MTcwYzM0NzkzZDhjMzRlMmY3NDQ2M2FhODllZDRlMWU5NTBmZmEwODQ3YmU2ZTQ0ZDYxM2VjMTk5OGQxNzRiZDE3OGNmMDEwNGUxNzI2MTYyNTUyMzMyIiwiY2xpZW50X2lkIjoiNjZiOTUzNWVhZDU5Y2E5MTJlNjllOGVmIiwiaWF0IjoxNzIzNDIxNTQ3LCJleHAiOjE3MjM0MjUxNDd9.1gI53-ZeesY0DesigAdu2qvYobQYB5XpjothS9m8BoU",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"users\":[\"dsfaghsdfhg\",\"asdfghsadfg\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/auth/api/client/add-users",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"api",
+						"client",
+						"add-users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

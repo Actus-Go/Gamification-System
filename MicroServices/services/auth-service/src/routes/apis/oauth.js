@@ -4,7 +4,6 @@ const Client = require('../../models/Client');
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const generateCode = require('../../utils/generateCode');
 require('dotenv').config();
 
 // Stores the clientId in the session after authentication.
@@ -28,6 +27,7 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, code, r
     const payload = {
         userId: client.userAccountId,
         clientId: client.clientId,
+        client_id: client._id,
     };
     const tokenValue = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
     return done(null, tokenValue);
@@ -44,6 +44,7 @@ router.post('/oauth/token', passport.authenticate(['basic', 'oauth2-client-passw
 );
 
 
+
 router.post('/register-client', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
         const { name, redirectUri } = req.body;
@@ -51,25 +52,7 @@ router.post('/register-client', passport.authenticate('jwt', { session: false })
         const clientId = generateCode();
         const clientSecret = generateCode();
 
-        const client = new Client({
-            name,
-            clientId,
-            clientSecret,
-            userAccountId: req.user._id, // Link client to the authenticated user
-            redirectUris: [redirectUri],
-            grants: ['client_credentials'] // Depending on what you want to allow
-        });
 
-        await client.save();
-
-        res.status(200).json({
-            clientId: client.clientId,
-            clientSecret: client.clientSecret
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Error registering client.' });
-    }
-});
 
 // router.post('/test', auth, (req, res) => res.json({message: 'success'}));
 
