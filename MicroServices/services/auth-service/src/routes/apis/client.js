@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { clientModel, trackerModel } = require('../../template/model');
 const auth = require('../../../../../common/api-proxy/src/middlewares/auth');
+const { ROLES } = require('../../../../../common/constants');
 
 router.post('/register-client', auth, async (req, res) => {
     try {
@@ -85,7 +86,7 @@ router.post('/add-users', auth, async (req, res) => {
 
 /**
  * @desc:   Get all clients for the authenticated user
- * @route:  GET /api/auth/client/client
+ * @route:  GET /api/auth/client
  * @query:  page
  * @example: /api/auth/client?page=1
  * @access: Private
@@ -98,7 +99,7 @@ router.get('/', auth, async (req, res) => {
         const skip = page * limit;
 
         let clients;
-        if (user.isAdmin) {
+        if (user.role == ROLES.Admin) {
             // Admins can view all clients
             clients = await Client.find().populate('userAccountId name').sort({ createdAt: -1 }).skip(skip).limit(limit);
         } else {
@@ -124,7 +125,7 @@ router.get('/:id', auth, async (req, res) => {
         const clientId = req.params.id;
 
         let client;
-        if (user.isAdmin) {
+        if (user.role == ROLES.Admin) {
             // Admins can view any client by ID
             client = await Client.findById(clientId);
         } else {
