@@ -17,7 +17,11 @@ app.use(cors());
 
 require('../../../services/auth-service/src/config/passport')(app);
 
-app.use('/auth', createProxyMiddleware({ target: 'http://localhost:8081', changeOrigin: true }));
+// Redirect any request start with /auth to localhost 8081
+app.use('/auth', createProxyMiddleware({
+     target: 'http://localhost:8081', changeOrigin: true 
+    })
+);
 app.use(auth);
 
 

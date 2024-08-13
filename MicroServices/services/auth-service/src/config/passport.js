@@ -7,7 +7,10 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const Client = require('../models/Client');
 require('dotenv').config();
 
-
+/* 
+Finding the client and verifying the Secret (request && database).
+If they match, the client is authenticated.
+*/
 passport.use(new ClientPasswordStrategy(
     function (clientId, clientSecret, done) {
         console.log(clientId);
@@ -27,8 +30,10 @@ opts.secretOrKey = process.env.JWT_SECRET;
 
 passport.use(
     new JwtStrategy(opts, (payload, done) => {
+        // payload -> JWT => {name: 'test', id: 1}. So I compare with database. 
         if (payload.userAccountId) {
             UserAccount.findById(payload.userAccountId)
+            // this parameter acting the result of findById method..
                 .then(userAccount => {
                     if (userAccount) {
                         return done(null, userAccount);

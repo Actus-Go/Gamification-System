@@ -7,7 +7,10 @@ const passport = require('passport');
 const generateCode = require('../../utils/generateCode');
 require('dotenv').config();
 
+// Stores the clientId in the session after authentication.
 server.serializeClient((client, done) => done(null, client.clientId));
+
+// Uses the clientId to retrieve the client's information from the database when needed for authentication.
 server.deserializeClient((clientId, done) => {
     const client = Client.findOne({ clientId: clientId });
     if (!client) {
@@ -30,8 +33,11 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, code, r
     return done(null, tokenValue);
 }));
 
-// server.token() handles token generation after the client has been successfully authenticated.
-// server.errorFieldHandler() a middleware that handles errors that might occur during the authentication process or token generation.
+
+// server.token() -> authenticate the client and then generate a token.
+// server.errorHandler() -> a middleware that handles errors that might occur during the authentication process or token generation.
+
+
 router.post('/oauth/token', passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
     server.token(),
     server.errorHandler()
@@ -41,6 +47,7 @@ router.post('/oauth/token', passport.authenticate(['basic', 'oauth2-client-passw
 router.post('/register-client', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
         const { name, redirectUri } = req.body;
+        // generateCode -> Random string (70 bytes) and acting the client ID.
         const clientId = generateCode();
         const clientSecret = generateCode();
 

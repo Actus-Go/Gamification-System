@@ -22,8 +22,8 @@ app.use(cors());
 
 setupDB();
 require('./config/passport')(app);
+app.use('/auth', routes);
 app.use(oauth);
-app.use(routes);
 
 
 
