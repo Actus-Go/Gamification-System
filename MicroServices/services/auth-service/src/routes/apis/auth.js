@@ -65,11 +65,21 @@ router.post('/register', passport.authenticate('jwt', { session: false }), role.
 
 router.get('/', auth, async(req, res) =>{
     try {
-        const userAccounts = await UserAccount.find().sort({ createdAt: -1 });
-        
-        if(!userAccounts.length > 0) return res.status(400).json({Message: "There is no users in this moment."})
+        const userAccounts = await UserAccount.find().select('-password').sort({ createdAt: -1 });
 
+        // If auth user's role are member, he can't retrieve any one, except himself.
+        if(req.user.role === ROLES.Member){
+            return res.status(200).json({User: req.user})
+        }
+
+        // If admin he can retrieve all.  
+        if(!userAccounts.length > 0)
+        {
+            return res.status(400).json({Message: "There is no users in this moment."})
+        }else{
             return res.status(200).json({Users: userAccounts});
+
+        }
 
     }catch(err) {
         console.log(err);
@@ -80,7 +90,8 @@ router.get('/', auth, async(req, res) =>{
 
 router.get('/:id', auth, async(req, res) =>{
     try {
-        const userAccount = await UserAccount.findById(req.params.id);
+
+        const userAccount = await UserAccount.findById(req.params.id).select('-password');
         if(!userAccount) return res.status(400).json({Message: "User not found."})
             if(req.user.role === ROLES.Member){
                 return res.status(200).json({User: req.user});
@@ -95,46 +106,61 @@ router.get('/:id', auth, async(req, res) =>{
     }
 });
 
-router.put('/:id', auth, async(req, res)=>{
-    try {
-        const userToUpdate = await UserAccount.findById(req.params.id)
-        const {username, password} = await req.body;
-        
-        
-        if(req.user.role === ROLES.Admin || req.user.id === userToUpdate.id){
-            
-            if(userToUpdate.username !== req.body.username || userToUpdate.password !== req.body.password){
-                userToUpdate.username = req.body.username;
-                userToUpdate.password = req.body.password;
-                await userToUpdate.save();
-                return res.status(200).json({User_updated_successfully: userToUpdate});
-            }else{
-                res.status(400).json({Message: "Nothing have changed."})
-            }
-        };
-        // Cases -> if user role is member and trying to update admin..
-        return res.status(400).json({Message: 'Credential error'})
-        
-    }catch(err) {
-        console.log(err);
-        res.status(400).send('Request faild. Try again.')
-    }
+
+
+router.put('/:id', auth, async (req, res) => {  
+    try {  
+        const userToUpdate = await UserAccount.findById(req.params.id);  
+
+
+        if(!userToUpdate) {
+            return res.status(400).json({Message: "User not found."})
+        }
+
+        const { username, password } = req.body;  
+
+        if (req.user.role === ROLES.Admin || req.user.id === userToUpdate._id.toString()){  
+             
+            if(username) {  
+                userToUpdate.username = username;  
+            }  
+            if(password) {  
+                userToUpdate.setPassword(password);
+            }  
+
+            await userToUpdate.save(); 
+            return res.status(200).json({ User_updated_successfully: userToUpdate});  
+        }  
+
+        return res.status(400).json({ Message: 'Unexpected error' });  
+
+    }catch (err) {  
+        console.log(err);  
+        res.status(400).send('Request failed. Try again.');  
+    }  
 });
+
 
 
 router.delete('/:id', auth, async(req, res) =>{
         try {
+
             const userToDelete = await UserAccount.findById(req.params.id)
-            if(!userToDelete) return res.status(400).json({Message: "User not found."})
-                
-                if(req.user.role === ROLES.Admin || req.user.id === userToDelete.id){
-                    await UserAccount.findByIdAndDelete(req.params.id);
-                    return res.status(200).json({Message: 'User deleted successfully.'})
-                }
+            if(!userToDelete) {
+                return res.status(400).json({Message: "User not found."})
+            }
+
+
+            if(req.user.role === ROLES.Admin || req.user.id === userToDelete._id.toString()){
+
+                await UserAccount.findByIdAndDelete(req.params.id);
+                return res.status(200).json({Message: 'User deleted successfully.'})
+
+        }
 
             return res.status(400).json({Message: 'Credential error'})
                 
-            }catch(err) {
+        }catch(err) {
                 console.log(err);
                 res.status(400).send('Request faild. Try again.')
             }
