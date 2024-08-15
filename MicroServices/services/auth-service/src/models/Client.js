@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 
-const ClientSchema = new Schema({
+const clientSchema = new Schema({
     name: String,
     clientSecret: String,
     clientId: {
@@ -16,6 +16,20 @@ const ClientSchema = new Schema({
     redirectUris: [String],
     grants: [String]
 }, { timestamps: true});
+
+clientSchema.set('toJSON', {
+    transform: (doc) => {
+        return {
+            id: doc._id,
+            name: doc.name,
+            clientId: doc.clientId,
+            clientSecret: doc.clientSecret,
+            redirectUris: doc.redirectUris,
+            grants: doc.grants,
+            userAccountId: doc.userAccountId,
+        };
+    }
+});
 
 const Client = mongoose.model('Client', ClientSchema);
 
