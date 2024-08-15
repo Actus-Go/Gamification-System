@@ -103,7 +103,7 @@ router.post('/:id/regenerate-credentials', auth, async (req, res) => {
             });
         }
 
-        if (!req.user.role ==  ROLES.Admin && client.userAccountId != req.user._id) {
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
             return res.status(403).json({
                 message: "This client belongs to another user so you cannot regenerate it's credentials."
             });
@@ -145,7 +145,7 @@ router.put('/:id', auth, async (req, res) => {
             });
         }
 
-        if (!req.user.role ==  ROLES.Admin && client.userAccountId != req.user._id) {
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
             return res.status(403).json({
                 message: 'This client belongs to another user so you cannot update it.'
             });
@@ -195,7 +195,7 @@ router.delete('/:id', auth, async (req, res) => {
             });
         }
 
-        if (!req.user.role ==  ROLES.Admin && client.userAccountId != req.user._id) {
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
             return res.status(403).json({
                 message: 'This client belongs to another user so you cannot delete it.'
             });    

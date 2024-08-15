@@ -31,6 +31,6 @@ clientSchema.set('toJSON', {
     }
 });
 
-const Client = mongoose.model('Client', ClientSchema);
+const Client = mongoose.model('Client', clientSchema);
 
 module.exports = Client;
