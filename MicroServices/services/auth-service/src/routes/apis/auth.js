@@ -4,6 +4,7 @@ const role = require('../../middlewares/role');
 const passport = require('passport');
 const { ROLES } = require('../../../../../common/constants');
 const jwt = require('jsonwebtoken');
+const auth = require('../../../../../common/api-proxy/src/middlewares/auth');
 require('dotenv').config();
 
 router.post('/login', async (req, res) => {
@@ -60,5 +61,87 @@ router.post('/register', passport.authenticate('jwt', { session: false }), role.
         });
     }
 });
+
+
+router.get('/', auth, async(req, res) =>{
+    try {
+        const userAccounts = await UserAccount.find().sort({ createdAt: -1 });
+        
+        if(!userAccounts.length > 0) return res.status(400).json({Message: "There is no users in this moment."})
+
+            return res.status(200).json({Users: userAccounts});
+
+    }catch(err) {
+        console.log(err);
+        res.status(400).send('Request faild. Try again.')
+    }
+});
+
+
+router.get('/:id', auth, async(req, res) =>{
+    try {
+        const userAccount = await UserAccount.findById(req.params.id);
+        if(!userAccount) return res.status(400).json({Message: "User not found."})
+            if(req.user.role === ROLES.Member){
+                return res.status(200).json({User: req.user});
+            }else{
+                res.status(200).json({User: userAccount})
+            }
+
+
+    }catch(err) {
+        console.log(err);
+        res.status(400).send('Request faild. Try again.')
+    }
+});
+
+router.put('/:id', auth, async(req, res)=>{
+    try {
+        const userToUpdate = await UserAccount.findById(req.params.id)
+        const {username, password} = await req.body;
+        
+        
+        if(req.user.role === ROLES.Admin || req.user.id === userToUpdate.id){
+            
+            if(userToUpdate.username !== req.body.username || userToUpdate.password !== req.body.password){
+                userToUpdate.username = req.body.username;
+                userToUpdate.password = req.body.password;
+                await userToUpdate.save();
+                return res.status(200).json({User_updated_successfully: userToUpdate});
+            }else{
+                res.status(400).json({Message: "Nothing have changed."})
+            }
+        };
+        // Cases -> if user role is member and trying to update admin..
+        return res.status(400).json({Message: 'Credential error'})
+        
+    }catch(err) {
+        console.log(err);
+        res.status(400).send('Request faild. Try again.')
+    }
+});
+
+
+router.delete('/:id', auth, async(req, res) =>{
+        try {
+            const userToDelete = await UserAccount.findById(req.params.id)
+            if(!userToDelete) return res.status(400).json({Message: "User not found."})
+                
+                if(req.user.role === ROLES.Admin || req.user.id === userToDelete.id){
+                    await UserAccount.findByIdAndDelete(req.params.id);
+                    return res.status(200).json({Message: 'User deleted successfully.'})
+                }
+
+            return res.status(400).json({Message: 'Credential error'})
+                
+            }catch(err) {
+                console.log(err);
+                res.status(400).send('Request faild. Try again.')
+            }
+        }
+)
+
+
+
 
 module.exports = router;
