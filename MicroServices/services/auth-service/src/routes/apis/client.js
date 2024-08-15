@@ -127,10 +127,10 @@ router.get('/:id', auth, async (req, res) => {
         let client;
         if (user.role === ROLES.Admin) {
             // Admins can view any client by ID
-            client = await Client.findOne({ clientId: clientId });
+            client = await Client.findById({ clientId });
         } else {
             // Members can only view clients they created
-            client = await Client.findOne({ clientId: clientId, userAccountId: user._id });
+            client = await Client.findOne({ _id: clientId, userAccountId: user._id });
         }
 
         if (!client) {
