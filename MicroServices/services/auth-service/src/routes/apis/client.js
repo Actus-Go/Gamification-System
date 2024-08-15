@@ -127,6 +127,36 @@ router.post('/:id/regenerate-credentials', auth, async (req, res) => {
 });
 
 /**
+ * @desc:   Get all clients for the authenticated user
+ * @route:  GET /api/auth/client
+ * @query:  page
+ * @example: /api/auth/client?page=1
+ * @access: Private
+ */
+router.get('/', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const page = parseInt(req.query.page) || 0;
+        const limit = 10;
+        const skip = page * limit;
+
+        let clients;
+        if (user.role == ROLES.Admin) {
+            // Admins can view all clients
+            clients = await Client.find().populate('userAccountId name').sort({ createdAt: -1 }).skip(skip).limit(limit);
+        } else {
+            // Members can only view clients they created
+            clients = await Client.find({ userAccountId: user._id }).populate('userAccountId name').skip(skip).limit(limit);
+        }
+
+        return res.status(200).json(clients);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error retrieving clients.' });
+    }
+});
+
+/**
  * @desc:   Updates a client by id
  * @route:  PUT /auth/api/client/:id
  * @access: Private
@@ -210,6 +240,36 @@ router.delete('/:id', auth, async (req, res) => {
         res.status(500).json({
             message: 'An unexpected error occurred while deleting the client.'
         });
+    }
+});
+
+/**
+ * @desc:   Get a client by ID
+ * @route:  GET /api/auth/client/:id
+ * @access: Private
+ */
+router.get('/:id', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const clientId = req.params.id;
+
+        let client;
+        if (user.role == ROLES.Admin) {
+            // Admins can view any client by ID
+            client = await Client.findById(clientId);
+        } else {
+            // Members can only view clients they created
+            client = await Client.findOne({ _id: clientId, userAccountId: user._id });
+        }
+
+        if (client) {
+            res.status(200).json(client);
+        } else {
+            res.status(404).json({ message: 'Client not found.' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error retrieving client.' });
     }
 });
 
