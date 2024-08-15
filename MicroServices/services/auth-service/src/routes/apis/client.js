@@ -99,12 +99,12 @@ router.get('/', auth, async (req, res) => {
         const skip = page * limit;
 
         let clients;
-        if (user.role == ROLES.Admin) {
+        if (user.role === ROLES.Admin) {
             // Admins can view all clients
             clients = await Client.find().populate('userAccountId name').sort({ createdAt: -1 }).skip(skip).limit(limit);
         } else {
             // Members can only view clients they created
-            clients = await Client.find({ userAccountId: user._id }).populate('userAccountId name').skip(skip).limit(limit);
+            clients = await Client.find({ userAccountId: user._id }).populate('userAccountId name').sort({ createdAt: -1 }).skip(skip).limit(limit);
         }
 
         return res.status(200).json(clients);
@@ -125,19 +125,19 @@ router.get('/:id', auth, async (req, res) => {
         const clientId = req.params.id;
 
         let client;
-        if (user.role == ROLES.Admin) {
+        if (user.role === ROLES.Admin) {
             // Admins can view any client by ID
-            client = await Client.findById(clientId);
+            client = await Client.findOne({ clientId: clientId });
         } else {
             // Members can only view clients they created
-            client = await Client.findOne({ _id: clientId, userAccountId: user._id });
+            client = await Client.findOne({ clientId: clientId, userAccountId: user._id });
         }
 
-        if (client) {
-            res.status(200).json(client);
-        } else {
-            res.status(404).json({ message: 'Client not found.' });
+        if (!client) {
+            return res.status(404).json({ message: 'Client not found.' });
         }
+
+        return res.status(200).json(client);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error retrieving client.' });
