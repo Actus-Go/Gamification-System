@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const validator = require('validator');
 const Client = require('../../models/Client');
 const generateCode = require('../../utils/generateCode');
 const fs = require('fs');
@@ -85,6 +86,47 @@ router.post('/add-users', auth, async (req, res) => {
 });
 
 /**
+ * @desc:   Regnerates client credentials by id
+ * @route:  POST /auth/api/client/:id/regenerate-credentials
+ * @access: Private
+ */
+
+router.post('/:id/regenerate-credentials', auth, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
+            return res.status(403).json({
+                message: "This client belongs to another user so you cannot regenerate it's credentials."
+            });
+        }
+
+        client.clientId = generateCode();
+        client.clientSecret = generateCode();
+
+        await client.save();
+
+        return res.status(200).json({
+            client,
+        });
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while regenerating the client credentials.'
+        });
+    }
+});
+
+/**
  * @desc:   Get all clients for the authenticated user
  * @route:  GET /api/auth/client
  * @query:  page
@@ -111,6 +153,93 @@ router.get('/', auth, async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error retrieving clients.' });
+    }
+});
+
+/**
+ * @desc:   Updates a client by id
+ * @route:  PUT /auth/api/client/:id
+ * @access: Private
+ */
+
+router.put('/:id', auth, async (req, res) => {
+    const { id } = req.params;
+    const { name, redirectUris } = req.body;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
+            return res.status(403).json({
+                message: 'This client belongs to another user so you cannot update it.'
+            });
+        }
+
+        if (name !== undefined) client.name = name;
+        
+        if (Array.isArray(redirectUris)) {
+            if (redirectUris.every((uri) => validator.isURL(uri))) {
+                client.redirectUris = redirectUris;
+            } else {
+                return res.status(400).json({
+                    message: '"redirectUris" must be an array of URIs',
+                });
+            }
+        }
+
+        await client.save();
+
+        return res.status(200).json({
+            client,
+        });
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while updating the client.'
+        });
+    }
+});
+
+/**
+ * @desc:   Deletes a client by id
+ * @route:  DELETE /auth/api/client/:id
+ * @access: Private
+ */
+
+router.delete('/:id', auth, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
+            return res.status(403).json({
+                message: 'This client belongs to another user so you cannot delete it.'
+            });    
+        }
+
+        await client.deleteOne();
+
+        res.status(204).send();
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while deleting the client.'
+        });
     }
 });
 
