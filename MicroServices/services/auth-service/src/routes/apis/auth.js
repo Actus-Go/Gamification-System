@@ -63,16 +63,10 @@ router.post('/register', passport.authenticate('jwt', { session: false }), role.
 });
 
 
-router.get('/', auth, async(req, res) =>{
+// GET ALL USERS. ONLY (ADMIN) CAN RETRIEVE THEM. 
+router.get('/', auth, role.check(ROLES.Admin), async(req, res) =>{
     try {
-        const userAccounts = await UserAccount.find().select('-password').sort({ createdAt: -1 });
-
-        // If auth user's role are member, he can't retrieve any one, except himself.
-        if(req.user.role === ROLES.Member){
-            return res.status(200).json({User: req.user})
-        }
-
-        // If admin he can retrieve all.  
+        const userAccounts = await UserAccount.find().select('username role').sort({ createdAt: -1 });
         if(!userAccounts.length > 0)
         {
             return res.status(400).json({Message: "There is no users in this moment."})
@@ -88,16 +82,29 @@ router.get('/', auth, async(req, res) =>{
 });
 
 
-router.get('/:id', auth, async(req, res) =>{
-    try {
+router.get('/:id', auth, async (req, res) => {  
+    try {  
+     
+        const userAccount = await UserAccount.findById(req.params.id).select('username role');  
+        
+         
+        if (!userAccount) {  
+            return res.status(404).json({ Message: "User not found." });  
+        }  
 
-        const userAccount = await UserAccount.findById(req.params.id).select('-password');
-        if(!userAccount) return res.status(400).json({Message: "User not found."})
-            if(req.user.role === ROLES.Member){
-                return res.status(200).json({User: req.user});
-            }else{
-                res.status(200).json({User: userAccount})
-            }
+        /* 
+        If (req.user) is a member, I will check if the target user (params.id) is the same as the current user(req.user),
+        if they are the same, the user can get his only information.
+        If not, they can't get the information, this is in (else statement).
+        If (req.user) is an admin, he can get retrieve all users.
+        */
+        if (req.user.role === ROLES.Member && req.user._id.toString() === req.params.id) {  
+            return res.status(200).json({ User: userAccount });  
+        } else if (req.user.role === ROLES.Admin) {  
+            return res.status(200).json({ User: userAccount });  
+        } else {  
+            return res.status(403).json({ Message: 'You are not allowed to make this request.' });  
+        } 
 
 
     }catch(err) {
