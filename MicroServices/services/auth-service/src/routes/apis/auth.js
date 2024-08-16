@@ -92,17 +92,10 @@ router.get('/:id', auth, async (req, res) => {
             return res.status(404).json({ Message: "User not found." });  
         }  
 
-        /* 
-        If (req.user) is a member, I will check if the target user (params.id) is the same as the current user(req.user),
-        if they are the same, the user can get his only information.
-        If not, they can't get the information, this is in (else statement).
-        If (req.user) is an admin, he can get retrieve all users.
-        */
-        if (req.user.role === ROLES.Member && req.user._id.toString() === req.params.id) {  
+        if (req.user.role === ROLES.Admin || req.user._id.toString() === req.params.id) {  
             return res.status(200).json({ User: userAccount });  
-        } else if (req.user.role === ROLES.Admin) {  
-            return res.status(200).json({ User: userAccount });  
-        } else {  
+
+        }else {  
             return res.status(403).json({ Message: 'You are not allowed to make this request.' });  
         } 
 
