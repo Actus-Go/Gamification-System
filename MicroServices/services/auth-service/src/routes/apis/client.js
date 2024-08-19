@@ -1,10 +1,12 @@
 const router = require('express').Router();
+const validator = require('validator');
 const Client = require('../../models/Client');
 const generateCode = require('../../utils/generateCode');
 const fs = require('fs');
 const path = require('path');
 const { clientModel, trackerModel } = require('../../template/model');
 const auth = require('../../../../../common/api-proxy/src/middlewares/auth');
+const { ROLES } = require('../../../../../common/constants');
 
 router.post('/register-client', auth, async (req, res) => {
     try {
@@ -80,6 +82,194 @@ router.post('/add-users', auth, async (req, res) => {
         console.log(error);
         res.status(500).json({ message: 'Error registering client.' });
 
+    }
+});
+
+/**
+ * @desc:   Regnerates client credentials by id
+ * @route:  POST /auth/api/client/:id/regenerate-credentials
+ * @access: Private
+ */
+
+router.post('/:id/regenerate-credentials', auth, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
+            return res.status(403).json({
+                message: "This client belongs to another user so you cannot regenerate it's credentials."
+            });
+        }
+
+        client.clientId = generateCode();
+        client.clientSecret = generateCode();
+
+        await client.save();
+
+        return res.status(200).json({
+            client,
+        });
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while regenerating the client credentials.'
+        });
+    }
+});
+
+/**
+ * @desc:   Get all clients for the authenticated user
+ * @route:  GET /api/auth/client
+ * @query:  page
+ * @example: /api/auth/client?page=1
+ * @access: Private
+ */
+router.get('/', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const page = parseInt(req.query.page) || 0;
+        const limit = 10;
+        const skip = page * limit;
+
+        let clients;
+        if (user.role === ROLES.Admin) {
+            // Admins can view all clients
+            clients = await Client.find().populate('userAccountId name').sort({ createdAt: -1 }).skip(skip).limit(limit);
+        } else {
+            // Members can only view clients they created
+            clients = await Client.find({ userAccountId: user._id }).populate('userAccountId name').sort({ createdAt: -1 }).skip(skip).limit(limit);
+        }
+
+        return res.status(200).json(clients);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error retrieving clients.' });
+    }
+});
+
+/**
+ * @desc:   Updates a client by id
+ * @route:  PUT /auth/api/client/:id
+ * @access: Private
+ */
+
+router.put('/:id', auth, async (req, res) => {
+    const { id } = req.params;
+    const { name, redirectUris } = req.body;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
+            return res.status(403).json({
+                message: 'This client belongs to another user so you cannot update it.'
+            });
+        }
+
+        if (name !== undefined) client.name = name;
+        
+        if (Array.isArray(redirectUris)) {
+            if (redirectUris.every((uri) => validator.isURL(uri))) {
+                client.redirectUris = redirectUris;
+            } else {
+                return res.status(400).json({
+                    message: '"redirectUris" must be an array of URIs',
+                });
+            }
+        }
+
+        await client.save();
+
+        return res.status(200).json({
+            client,
+        });
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while updating the client.'
+        });
+    }
+});
+
+/**
+ * @desc:   Deletes a client by id
+ * @route:  DELETE /auth/api/client/:id
+ * @access: Private
+ */
+
+router.delete('/:id', auth, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const client = await Client.findById(id);
+
+        if (!client) {
+            return res.status(404).json({
+                message: 'There is no client with this id.'
+            });
+        }
+
+        if (req.user.role !==  ROLES.Admin && client.userAccountId != req.user._id) {
+            return res.status(403).json({
+                message: 'This client belongs to another user so you cannot delete it.'
+            });    
+        }
+
+        await client.deleteOne();
+
+        res.status(204).send();
+    } catch(e) {
+        console.error(e);
+
+        res.status(500).json({
+            message: 'An unexpected error occurred while deleting the client.'
+        });
+    }
+});
+
+/**
+ * @desc:   Get a client by ID
+ * @route:  GET /api/auth/client/:id
+ * @access: Private
+ */
+router.get('/:id', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const clientId = req.params.id;
+
+        let client;
+        if (user.role === ROLES.Admin) {
+            // Admins can view any client by ID
+            client = await Client.findById(clientId);
+        } else {
+            // Members can only view clients they created
+            client = await Client.findOne({ _id: clientId, userAccountId: user._id });
+        }
+
+        if (!client) {
+            return res.status(404).json({ message: 'Client not found.' });
+        }
+
+        return res.status(200).json(client);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error retrieving client.' });
     }
 });
 
