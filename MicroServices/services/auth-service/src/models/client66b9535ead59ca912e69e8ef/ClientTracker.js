@@ -9,8 +9,9 @@ const playerTrackerSchema = new Schema({
     numberOfPoints: {
         type: Number,
     },
-    category: String,
-    productId: String
+    categoryId: String,
+    productId: String,
+    isPaidFromTotalPoints: Boolean
 
 }, { timestamps: true });
 

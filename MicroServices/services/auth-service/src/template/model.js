@@ -11,14 +11,11 @@ const playerFrom${client_id}Schema = new Schema({
         type: Number,
         default: 0
     },
+    // How many times you get points from redeeming products
     numberOfRedemPoints: {
         type: Number,
         default: 0
     },
-    client: {
-        type: Schema.Types.ObjectId,
-        ref: "Client"
-    }
 
 }, { timestamps: true });
 playerFrom${client_id}Schema.index({points: -1});
@@ -40,8 +37,9 @@ const playerTrackerSchema = new Schema({
     numberOfPoints: {
         type: Number,
     },
-    category: String,
-    productId: String
+    categoryId: String,
+    productId: String,
+    isPaidFromTotalPoints: Boolean
 
 }, { timestamps: true });
 
@@ -56,4 +54,4 @@ module.exports = PlayerTracker;
 
 
 
-module.exports = {clientModel, trackerModel};
+module.exports = { clientModel, trackerModel };
