@@ -1,9 +1,11 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const chalk = require('chalk');
+const routes = require('./routes');
 const setupDB = require('../../../common/api-proxy/src/utils/db')
-require('dotenv').config();
 
 
 const app = express();
@@ -16,6 +18,9 @@ app.use(express.urlencoded({ extended: false }));
 
 
 app.use(cors());
+
+app.use(routes)
+
 setupDB();
 
 
