@@ -33,7 +33,7 @@ const handleError = (error, res, message = "An error occurred.") => {
  */
 router.post("/add", async (req, res) => {
   try {
-    const clientId = req.body.user._id;
+    const clientId = req.user._id;
     const playerId = req.params.id;
     const order = req.body.order;
 
