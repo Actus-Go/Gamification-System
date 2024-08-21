@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const chalk = require('chalk');
+const auth = require('../../../common/api-proxy/src/middlewares/auth')
 const routes = require('./routes');
 const setupDB = require('../../../common/api-proxy/src/utils/db')
 
@@ -19,17 +20,17 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cors());
 
-app.use(routes)
+require('../../auth-service/src/config/passport')(app);
+
+app.use(auth);
+app.use(routes);
 
 setupDB();
-
-
-
 
 server.listen(port, () => {
     console.log(
         `${chalk.green('✓')} ${chalk.blue(
-            `Auth service Listening on port ${port}. Visit http://localhost:${port}/ in your browser.`
+            `Points service Listening on port ${port}. Visit http://localhost:${port}/ in your browser.`
         )}`
     );
 });

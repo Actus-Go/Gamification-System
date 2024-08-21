@@ -21,8 +21,6 @@ app.use(cors());
 require('../../../services/auth-service/src/config/passport')(app);
 
 app.use('/auth', createProxyMiddleware({ target: `http://localhost:${AUTH_SERVICE_PORT}`, changeOrigin: true }));
-app.use(auth);
-
 
 app.use('/points', createProxyMiddleware({ target: `http://localhost:${POINTS_SERVICE_PORT}`, changeOrigin: true }));
 
