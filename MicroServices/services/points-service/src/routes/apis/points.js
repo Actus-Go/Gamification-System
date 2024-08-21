@@ -46,14 +46,28 @@ router.post("/add", async (req, res) => {
     const player = await getPlayer(clientId, playerId, res);
     if (!player) return;
 
+    const PlayerTracker = require(`../../models/client${clientId}/ClientTracker`);
+
     // Calculate the total points from the products in the order
-    const totalPoints = order.products.reduce(
-      (sum, product) => sum + product.points,
-      0
-    );
+    const totalPoints = order.products.reduce((sum, product) => {
+      const points = product.points;
+
+      // Create a tracker instance for each product
+      const tracker = new PlayerTracker({
+        Player: player._id,
+        numberOfPoints: points,
+        categoryId: product.categoryId,
+        productId: product.productId,
+        isPaidFromTotalPoints: false,
+      });
+
+      tracker.save();
+      return sum + points;
+    }, 0);
 
     // Add the calculated points to the player's account
     player.points += totalPoints;
+    player.numberOfRedeemPoints += 1;
     await player.save();
 
     res.status(200).json({ message: "Points added successfully." });
