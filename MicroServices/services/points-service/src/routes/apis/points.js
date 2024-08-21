@@ -31,10 +31,12 @@ const handleError = (error, res, message = "An error occurred.") => {
  * @access: Private
  * @description: Subtracts points from a player's account when products are paid using points
  */
-router.post("/pay", async (req, res) => {
+router.post("/:userId/pay", async (req, res) => {
   try {
-    const clientId = req.user._id;
-    const playerId = req.params.id;
+    // The user will come to you through proxy and you'll find it in body
+    const user = req.body.user;
+    const clientId = user.id;
+    const playerId = req.params.userId;
     const order = req.body.order;
 
     // Verify if the order is paid using points before subtracting points
@@ -85,5 +87,6 @@ router.post("/pay", async (req, res) => {
     handleError(error, res, "Error paying with points.");
   }
 });
+
 
 module.exports = router;

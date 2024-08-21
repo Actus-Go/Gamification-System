@@ -1,5 +1,4 @@
 const { Router } = require('express');
-const pointsRoutes = require('./points');
 
 const router = Router();
 
@@ -8,8 +7,9 @@ const router = Router();
  * @access: Private
  */
 
-router.get('/:userId', (req, rea) => {
-
+router.get('/:userId', (req, res) => {
+    console.log(req.params);
+    return res.send('asfdg');
 });
 
 /**
@@ -17,10 +17,10 @@ router.get('/:userId', (req, rea) => {
  * @access: Private
  */
 
-router.get('/:userId/history', (req, rea) => {
-
+router.get('/:userId/history', (req, res) => {
+    console.log(req.params);
+    return res.send('asfdg');
 });
 
-router.use('/:userId/points', pointsRoutes);
 
 module.exports = router;

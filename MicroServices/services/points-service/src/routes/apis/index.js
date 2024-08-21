@@ -1,8 +1,11 @@
 const { Router } = require("express");
-const playerRoutes = require("./player");
-
 const router = Router();
 
-router.use("/player:id", playerRoutes);
+const playerRoutes = require("./player");
+const pointsRoutes = require('./points');
+
+router.use('/', pointsRoutes);
+router.use("/player", playerRoutes);
+
 
 module.exports = router;

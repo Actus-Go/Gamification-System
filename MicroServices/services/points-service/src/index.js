@@ -16,20 +16,18 @@ const port = process.env.POINTS_SERVICE_PORT;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+setupDB();
 
 app.use(cors());
 
-app.use(routes)
-
-setupDB();
-
+app.use(routes);
 
 
 
 server.listen(port, () => {
     console.log(
         `${chalk.green('✓')} ${chalk.blue(
-            `Auth service Listening on port ${port}. Visit http://localhost:${port}/ in your browser.`
+            `Points service Listening on port ${port}. Visit http://localhost:${port}/ in your browser.`
         )}`
     );
 });

@@ -1,11 +1,14 @@
 const { Router } = require('express');
+const router = Router();
+require('dotenv').config();
+
 const apiRoutes = require('./apis');
 
-const router = Router();
 
-const BASE_API_URL = process.env.BASE_API_URL;
+const apiURL = process.env.BASE_API_URL;
 
-const api = `/${BASE_API_URL}}`;
+
+const api = `/${apiURL}`;
 
 router.use(api, apiRoutes);
 router.use(api, (req, res) => res.status(404).json('No API route found'));
