@@ -62,12 +62,14 @@ router.post("/add", async (req, res) => {
       });
 
       tracker.save();
+
+      player.numberOfRedeemPoints += 1;
+
       return sum + points;
     }, 0);
 
     // Add the calculated points to the player's account
     player.points += totalPoints;
-    player.numberOfRedeemPoints += 1;
     await player.save();
 
     res.status(200).json({ message: "Points added successfully." });
