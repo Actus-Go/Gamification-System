@@ -48,11 +48,23 @@ router.post("/pay", async (req, res) => {
     const player = await getPlayer(clientId, playerId, res);
     if (!player) return; // Exit if the player is not found
 
+    const PlayerTracker = require(`../../models/client${clientId}/ClientTracker`);
+
     // Calculate the total points required from the products in the order
-    const pointsRequired = order.products.reduce(
-      (sum, product) => sum + product.points,
-      0
-    );
+    const pointsRequired = order.products.reduce((sum, product) => {
+      const points = product.points;
+      // Create a tracker instance for each product
+      const tracker = new PlayerTracker({
+        Player: playerId._id,
+        numberOfPoints: points,
+        categoryId: product.categoryId,
+        productId: product.productId,
+        isPaidFromTotalPoints: true,
+      });
+
+      tracker.save();
+      return sum + points;
+    }, 0);
 
     // Check if the player has enough points to complete the transaction
     if (player.points < pointsRequired) {
