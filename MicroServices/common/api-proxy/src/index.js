@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -5,29 +7,30 @@ const chalk = require('chalk');
 const auth = require('./middlewares/auth');
 const jwt = require('jsonwebtoken');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-require('dotenv').config();
 
 
 const app = express();
 const server = http.createServer(app);
 
-const port = process.env.MAIN_PORT;
+const MAIN_PORT = process.env.MAIN_PORT || 8080;
+const AUTH_SERVICE_PORT = process.env.AUTH_SERVICE_PORT || 8081;
+const POINTS_SERVICE_PORT = process.env.POINTS_SERVICE_PORT || 8082;
 
 app.use(cors());
 
 require('../../../services/auth-service/src/config/passport')(app);
 
-app.use('/auth', createProxyMiddleware({ target: 'http://localhost:8081', changeOrigin: true }));
+app.use('/auth', createProxyMiddleware({ target: `http://localhost:${AUTH_SERVICE_PORT}`, changeOrigin: true }));
 app.use(auth);
 
 
+app.use('/points', createProxyMiddleware({ target: `http://localhost:${POINTS_SERVICE_PORT}`, changeOrigin: true }));
 
 
-
-server.listen(port, () => {
+server.listen(MAIN_PORT, () => {
     console.log(
         `${chalk.green('✓')} ${chalk.blue(
-            `Listening on port ${port}. Visit http://localhost:${port}/ in your browser.`
+            `Listening on port ${MAIN_PORT}. Visit http://localhost:${MAIN_PORT}/ in your browser.`
         )}`
     );
 });
