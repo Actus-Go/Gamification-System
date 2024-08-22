@@ -58,6 +58,10 @@ const trackerSchema = new Schema(
             type: Number,
             required: true,
         },
+        isPaidFromTotalPoints: {
+            type: Boolean,
+            required: true,
+        },
     },
     { 
         timestamps: true,
