@@ -27,31 +27,67 @@ const getPlayer = async (clientId, playerId, res) => {
 
   
 /**
- * @route:  GET points/api/player/:userId
+ * @route:  GET points/api/player/:playerId
  * @access: Private
  */
 
 
 router.get('/:playerId', async(req, res) => {
+  try {
     const user = req.body.user;
     const clientId = user.id;
     const playerId = req.params.playerId;
-
+    
     const player = await getPlayer(clientId, playerId, res);
     if(!player) return;
-
+    
     return res.status(200).json({Player: player});
-})
-
-
-/**
- * @route:  GET points/api/player/:userId/history
- * @access: Private
- */
-
-router.get('/:playerId/history', (req, res) => {
+    
+  }catch (err) {
+    console.log(err);
+    res.status(400).send('Request faild. Try again.')
+}
+  })
   
-})
+  
+  /**
+   * @route:  GET points/api/player/:playerId/history
+   * @access: Private
+  */
+ 
+  router.get('/:playerId/history', async (req, res) => {
+    try {
+
+      const user = req.body.user; 
+      const clientId = user.id;
+      const playerId = req.params.playerId;
+
+       
+      const player = await getPlayer(clientId, playerId, res);
+      if (!player) return;
+
+
+      const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/ClientTracker`);
+      if(PlayerTracker) console.log('success')
+    
+      const playerHistory = await PlayerTracker.find({
+        Player:  player,
+      })
+      
+   
+      return res.status(200).json({
+          PlayerHistory: playerHistory
+      });
+
+
+
+    }catch (err) {
+      console.log(err);
+      res.status(400).send('Request faild. Try again.')
+  }
+});
+
+
 
 
 
