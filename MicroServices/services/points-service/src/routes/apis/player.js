@@ -31,6 +31,7 @@ const getPlayer = async (clientId, playerId, res) => {
  * @access: Private
  */
 
+
 router.get('/:playerId', async(req, res) => {
     const user = req.body.user;
     const clientId = user.id;
@@ -40,7 +41,8 @@ router.get('/:playerId', async(req, res) => {
     if(!player) return;
 
     return res.status(200).json({Player: player});
-});
+})
+
 
 /**
  * @route:  GET points/api/player/:userId/history
@@ -48,8 +50,10 @@ router.get('/:playerId', async(req, res) => {
  */
 
 router.get('/:playerId/history', (req, res) => {
-    
-});
+  
+})
+
+
 
 
 module.exports = router;
