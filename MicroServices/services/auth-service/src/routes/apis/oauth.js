@@ -26,7 +26,7 @@ server.exchange(oauth2orize.exchange.clientCredentials(function (client, code, r
         clientId: client.clientId,
         client_id: client._id,
     };
-    const tokenValue = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const tokenValue = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
     return done(null, tokenValue);
 }));
 
