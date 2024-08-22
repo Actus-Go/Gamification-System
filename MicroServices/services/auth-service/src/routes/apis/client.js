@@ -77,7 +77,7 @@ router.post('/add-plsyers', auth, async (req, res) => {
             const option = {
                 insertOne: {
                     "document": {
-                        _id: mongoose.Types.ObjectId(playerId),
+                        _id: new mongoose.Types.ObjectId(playerId),
                     }
                 }
             }
