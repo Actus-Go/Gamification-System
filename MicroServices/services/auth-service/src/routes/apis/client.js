@@ -64,16 +64,16 @@ router.post('/register-client', auth, async (req, res) => {
  * @access: Private
  */
 
-router.post('/add-plsyers', auth, async (req, res) => {
+router.post('/add-players', auth, async (req, res) => {
     try {
-        const playersIds = req.body.playerIds;
+        const playerIds = req.body.playerIds;
         const clientObjectId = req.user._id;
 
         const Player = require(`../../models/client${clientObjectId}/Player`);
 
         const bulkOperations = [];
 
-        playersIds.forEach(playerId => {
+        playerIds.forEach(playerId => {
             const option = {
                 insertOne: {
                     "document": {
