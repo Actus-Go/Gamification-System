@@ -10,6 +10,7 @@ class Gamification {
 
     async getAccessToken() {
         console.log(this.clientId);
+        console.log(this.clientSecret);
         const base64Credentials = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
         const data = {
             grant_type: 'client_credentials'
@@ -35,14 +36,16 @@ class Gamification {
 
     // static Clearly distinguishes between operations that affect all instances of the class (class-level operations) and those that affect a single instance (instance-level operations).
     static async registerUsers(User) {
-
         const users = await User.find({}, '_id');
+
         console.log(users);
-        const addUsersEndpoint = '/auth/api/client/add-users';
+
+        const addUsersEndpoint = '/auth/api/client/add-players';
 
         const data = {
-            users
+            playerIds: users.map(user => user._id.toString()),
         };
+
         console.log(process.env.GAMIFICATION_TOKEN);
         const axiosConfig = {
             headers: {
@@ -52,8 +55,8 @@ class Gamification {
         };
 
         await axios.post(config.baseURL + addUsersEndpoint, data, axiosConfig)
-            .then((result) => console.log('Users Added'))
-            .catch(error => console.log('Failed to add users', error.message));
+            .then((result) => console.log('Players added'))
+            .catch(error => console.log('Failed to add players', error.message));
     }
 }
 
