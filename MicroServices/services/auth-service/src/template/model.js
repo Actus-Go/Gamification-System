@@ -26,7 +26,7 @@ playerSchema.set('toJSON', {
         return {
             id: doc._id.toString(),
             points: doc.points,
-            redeemedPoints: doc.redeemedPoints,
+            numberOfRedeemPoints: doc.numberOfRedeemPoints,
         };
     }
 });
@@ -79,6 +79,7 @@ trackerSchema.set('toJSON', {
             productId: doc.productId,
             categoryId: doc.categoryId,
             points: doc.points,
+            isPaidFromTotalPoints: doc.isPaidFromTotalPoints,
         };
     }
 });

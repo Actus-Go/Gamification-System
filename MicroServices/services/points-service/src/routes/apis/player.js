@@ -58,6 +58,8 @@ router.get('/filter', async (req, res) => {
                 { $skip: skip },
                 { $limit: limit },
             ]);
+
+            players = players.map((player) => new Player(player));
         }
 
         res.status(200).json({
