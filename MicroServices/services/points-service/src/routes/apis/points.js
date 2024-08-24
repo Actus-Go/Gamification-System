@@ -27,7 +27,7 @@ const handleError = (error, res, message = "An error occurred.") => {
 };
 
 /**
- * @route:  POST points/api/player/:id/points/pay
+ * @route:  POST points/api/:id/pay
  * @access: Private
  * @description: Subtracts points from a player's account when products are paid using points
  */
@@ -50,7 +50,7 @@ router.post("/:userId/pay", async (req, res) => {
     const player = await getPlayer(clientId, playerId, res);
     if (!player) return; // Exit if the player is not found
 
-    const PlayerTracker = require(`../../models/client${clientId}/ClientTracker`);
+    const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/Tracker`);
 
     // Calculate the total points required from the products in the order
     const pointsRequired = order.products.reduce((sum, product) => {
