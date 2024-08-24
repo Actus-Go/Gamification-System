@@ -35,8 +35,8 @@ const createTrackerForProduct = async (
 ) => {
   const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/Tracker`);
   const tracker = new PlayerTracker({
-    Player: playerId,
-    numberOfPoints: product.points,
+    player: playerId,
+    points: product.points,
     categoryId: product.categoryId,
     productId: product.productId,
     isPaidFromTotalPoints,
@@ -45,7 +45,7 @@ const createTrackerForProduct = async (
 };
 
 /**
- * @route:  POST points/api/player/:userId/pay
+ * @route:  POST points/api/:userId/pay
  * @access: Private
  * @description: Subtracts points from a player's account when products are paid using points
  */
@@ -94,7 +94,7 @@ router.post("/:userId/pay", async (req, res) => {
 });
 
 /**
- * @route:  POST points/api/player/:userId/add
+ * @route:  POST points/api/:userId/add
  * @access: Private
  * @description: Adds points to a player's account
  */
