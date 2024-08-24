@@ -8,7 +8,7 @@ const getPlayer = async (clientId, playerId, res) => {
       return null;
     }
   
-    const Player = require(`../../../../auth-service/src/models/client${clientId}/ClientPlayer`);
+    const Player = require(`../../../../auth-service/src/models/client${clientId}/Player`);
     const player = await Player.findById(playerId);
   
     if (!player) {
@@ -31,9 +31,20 @@ const getPlayer = async (clientId, playerId, res) => {
  * @access: Private
  */
 
-router.get('/:playerId', (req, res) => {
-    console.log(req.params);
-    return res.send('working.');
+router.get('/:playerId', async (req, res) => {
+    try {
+        const clientId = req.body.user.id;
+        const playerId = req.params.playerId;
+        const player = await getPlayer(clientId, playerId, res);
+
+        if (!player) {
+            return;
+        }
+
+        return res.status(200).json({ player });
+    } catch (err) {
+        handleError(err, res, 'Request failed. Try again.');
+    }
 });
 
 /**
