@@ -9,7 +9,7 @@ const getPlayer = async (clientId, playerId, res) => {
     return null;
   }
 
-  const Player = require(`../../../../auth-service/src/models/client${clientId}/ClientPlayer`);
+  const Player = require(`../../../../auth-service/src/models/client${clientId}/Player`);
   const player = await Player.findById(playerId);
 
   if (!player) {
@@ -33,7 +33,7 @@ const createTrackerForProduct = async (
   product,
   isPaidFromTotalPoints
 ) => {
-  const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/ClientTracker`);
+  const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/Player`);
   const tracker = new PlayerTracker({
     Player: playerId,
     numberOfPoints: product.points,
