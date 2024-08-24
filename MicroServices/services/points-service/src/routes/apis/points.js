@@ -33,7 +33,7 @@ const createTrackerForProduct = async (
   product,
   isPaidFromTotalPoints
 ) => {
-  const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/Player`);
+  const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/Tracker`);
   const tracker = new PlayerTracker({
     Player: playerId,
     numberOfPoints: product.points,
