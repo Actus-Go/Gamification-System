@@ -31,6 +31,7 @@ const getPlayer = async (clientId, playerId, res) => {
  * @access: Private
  */
 
+
 router.get('/:playerId', async (req, res) => {
     try {
         const clientId = req.body.user.id;
@@ -45,7 +46,7 @@ router.get('/:playerId', async (req, res) => {
     } catch (err) {
         handleError(err, res, 'Request failed. Try again.');
     }
-});
+
 
 /**
  * @route:  GET points/api/players/:playerId/history
