@@ -67,6 +67,7 @@ router.post("/:userId/pay", async (req, res) => {
     const player = await getPlayer(clientId, playerId, res);
     if (!player) return; // Exit if the player is not found
 
+
     // Calculate the total points required from the products in the order
     const pointsRequired = order.products.reduce((sum, product) => {
       createTrackerForProduct(clientId, playerId, product, true);
