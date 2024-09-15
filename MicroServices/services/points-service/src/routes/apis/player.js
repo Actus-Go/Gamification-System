@@ -2,15 +2,51 @@ const { Router } = require('express');
 
 const router = Router();
 
+const getPlayer = async (clientId, playerId, res) => {
+    if (!clientId) {
+      res.status(404).json({ message: "Client not found." });
+      return null;
+    }
+  
+    const Player = require(`../../../../auth-service/src/models/client${clientId}/Player`);
+    const player = await Player.findById(playerId);
+  
+    if (!player) {
+      res.status(404).json({ message: "Player not found." });
+      return null;
+    }
+  
+    return player;
+  };
+  
+  // Error Handler
+  const handleError = (error, res, message = "An error occurred.") => {
+    console.error(error);
+    res.status(500).json({ message });
+};
+
+  
 /**
  * @route:  GET points/api/players/:playerId
  * @access: Private
  */
 
-router.get('/:playerId', (req, res) => {
-    console.log(req.params);
-    return res.send('working.');
-});
+
+router.get('/:playerId', async (req, res) => {
+    try {
+        const clientId = req.body.user.id;
+        const playerId = req.params.playerId;
+        const player = await getPlayer(clientId, playerId, res);
+
+        if (!player) {
+            return;
+        }
+
+        return res.status(200).json({ player });
+    } catch (err) {
+        handleError(err, res, 'Request failed. Try again.');
+    }
+
 
 /**
  * @route:  GET points/api/players/:playerId/history
