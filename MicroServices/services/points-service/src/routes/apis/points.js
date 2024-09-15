@@ -45,6 +45,7 @@ const createTrackerForProduct = async (
 };
 
 /**
+=======
  * @route:  POST points/api/:userId/pay
  * @access: Private
  * @description: Subtracts points from a player's account when products are paid using points

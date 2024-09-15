@@ -51,11 +51,29 @@ router.get('/:playerId', async (req, res) => {
 /**
  * @route:  GET points/api/players/:playerId/history
  * @access: Private
- */
+*/
 
-router.get('/:playerId/history', (req, res) => {
-    console.log(req.params);
-    return res.send('asfdg');
+router.get('/:playerId/history', async(req, res) => {
+    try {
+        const clientId = req.body.user.id;
+        const playerId = req.params.playerId;
+        const player = await getPlayer(clientId, playerId, res);
+    
+        if (!player) {
+            return;
+        }
+
+        const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/Tracker`)
+
+        const playerHistory = await PlayerTracker.find({
+            player: player
+        })
+    
+        return res.status(200).json({ playerHistory });
+    } catch (err) {
+        handleError(err, res, 'Request failed. Try again.');
+    }
+    
 });
 
 /**
