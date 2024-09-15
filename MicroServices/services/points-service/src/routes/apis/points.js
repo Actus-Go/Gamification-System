@@ -9,7 +9,7 @@ const getPlayer = async (clientId, playerId, res) => {
     return null;
   }
 
-  const Player = require(`../../models/client${clientId}/ClientPlayer`);
+  const Player = require(`../../../../auth-service/src/models/client${clientId}/Player`);
   const player = await Player.findById(playerId);
 
   if (!player) {
@@ -50,7 +50,7 @@ router.post("/:userId/pay", async (req, res) => {
     const player = await getPlayer(clientId, playerId, res);
     if (!player) return; // Exit if the player is not found
 
-    const PlayerTracker = require(`../../models/client${clientId}/ClientTracker`);
+    const PlayerTracker = require(`../../../../auth-service/src/models/client${clientId}/Tracker`);
 
     // Calculate the total points required from the products in the order
     const pointsRequired = order.products.reduce((sum, product) => {
