@@ -50,50 +50,50 @@ const createTrackerForProduct = async (
  * @access: Private
  * @description: Subtracts points from a player's account when products are paid using points
  */
-router.post("/:userId/pay", async (req, res) => {
-  try {
-    // The user will come to you through proxy and you'll find it in body
-    const { user, order } = req.body;
-    const clientId = user.id;
-    const playerId = req.params.userId;
+// router.post("/:userId/pay", async (req, res) => {
+//   try {
+//     // The user will come to you through proxy and you'll find it in body
+//     const { user, order } = req.body;
+//     const clientId = user.id;
+//     const playerId = req.params.userId;
 
-    // Verify if the order is paid using points before subtracting points
-    if (!order.isPaidFromTotalPoints) {
-      return res.status(400).json({
-        message: "Order is not paid from points.",
-      });
-    }
+//     // Verify if the order is paid using points before subtracting points
+//     if (!order.isPaidFromTotalPoints) {
+//       return res.status(400).json({
+//         message: "Order is not paid from points.",
+//       });
+//     }
 
-    // Fetch the player and perform common checks
-    const player = await getPlayer(clientId, playerId, res);
-    if (!player) return; // Exit if the player is not found
+//     // Fetch the player and perform common checks
+//     const player = await getPlayer(clientId, playerId, res);
+//     if (!player) return; // Exit if the player is not found
 
 
-    // Calculate the total points required from the products in the order
-    const pointsRequired = order.products.reduce((sum, product) => {
-      createTrackerForProduct(clientId, playerId, product, true);
-      return sum + points;
-    }, 0);
+//     // Calculate the total points required from the products in the order
+//     const pointsRequired = order.products.reduce((sum, product) => {
+//       createTrackerForProduct(clientId, playerId, product, true);
+//       return sum + points;
+//     }, 0);
 
-    // Check if the player has enough points to complete the transaction
-    if (player.points < pointsRequired) {
-      return res
-        .status(400)
-        .json({ message: "Insufficient points to complete the transaction." });
-    }
+//     // Check if the player has enough points to complete the transaction
+//     if (player.points < pointsRequired) {
+//       return res
+//         .status(400)
+//         .json({ message: "Insufficient points to complete the transaction." });
+//     }
 
-    // Subtract the calculated points from the player's account
-    player.points -= pointsRequired;
-    await player.save();
+//     // Subtract the calculated points from the player's account
+//     player.points -= pointsRequired;
+//     await player.save();
 
-    res.status(200).json({
-      message: "Points deducted successfully.",
-      totalPoints: player.points,
-    });
-  } catch (error) {
-    handleError(error, res, "Error paying with points.");
-  }
-});
+//     res.status(200).json({
+//       message: "Points deducted successfully.",
+//       totalPoints: player.points,
+//     });
+//   } catch (error) {
+//     handleError(error, res, "Error paying with points.");
+//   }
+// });
 
 /**
  * @route:  POST points/api/:userId/add
