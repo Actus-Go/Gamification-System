@@ -28,7 +28,5 @@ USER node
 EXPOSE 8080
 
 
-RUN chmod +x ./start-services.sh
-
-# Use the shell script to start all services
-CMD ["/app/start-services.sh"]
+# Run the application.
+CMD ["sh", "-c", "npm run auth-service & npm run points-service & npm run main-service"]
