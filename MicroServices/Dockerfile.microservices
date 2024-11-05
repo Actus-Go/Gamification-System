@@ -10,6 +10,8 @@ COPY . /app
 
 WORKDIR /app
 
+RUN npm install
+
 # Run the application as a non-root user.
 USER node
 
