@@ -14,9 +14,6 @@ WORKDIR /app
 # Copy package.json and package-lock.json first to take advantage of Docker cache
 COPY ./MicroServices/package.json ./MicroServices/package-lock.json ./
 
-# Install the dependencies
-RUN npm install
-
 # Leverage npm cache if possible (cache mount for npm)
 RUN --mount=type=cache,id=s/6cf39e7a-2394-4d4d-a6bb-ea01ce2b94c8-npm-cache,target=/root/.npm npm install
 
