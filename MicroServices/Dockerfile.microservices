@@ -1,24 +1,30 @@
+# Use the specified Node version
 ARG NODE_VERSION=20.12.0
-
 FROM node:${NODE_VERSION}-alpine
 
 # Use production node environment by default.
 ENV NODE_ENV production
 
-# Copy the rest of the source files into the image.
-COPY . /app
-
+# Set working directory inside the container
 WORKDIR /app
 
+# Copy package.json and package-lock.json first to take advantage of Docker cache
+COPY package.json package-lock.json ./
+
+# Install the dependencies
 RUN npm install
 
-# Run the application as a non-root user.
-USER node
+# Now copy the rest of the source files into the image
+COPY . /app
 
+# Leverage npm cache if possible (cache mount for npm)
+RUN --mount=type=cache,id=s/npm-cache,target=/root/.npm npm install
+
+# Run the application as a non-root user (important for security)
+USER node
 
 # Expose the port that the application listens on.
 EXPOSE 8080
 
-
-# Run the application.
+# Command to run multiple services, ensures they are run in the background
 CMD ["sh", "-c", "npm run auth-service & npm run points-service & npm run main-service"]
