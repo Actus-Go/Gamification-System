@@ -1,31 +1,31 @@
+# Use a specific Node.js version (20.12.0) with the Alpine image.
 ARG NODE_VERSION=20.12.0
-
 FROM node:${NODE_VERSION}-alpine
 
-# Use production node environment by default.
+# Set the working directory for the application.
+WORKDIR /app
+
+# Set environment variable to production mode.
 ENV NODE_ENV production
 
-# Copy the rest of the source files into the image.
-COPY . /app
-
-WORKDIR /app/MicroServices
-
-# Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
+# Copy the package.json and package-lock.json first to leverage Docker's cache.
 COPY ./MicroServices/package.json ./MicroServices/package-lock.json ./
 
+# Install dependencies.
 RUN npm install
 
-# Run the application as a non-root user.
-USER node
+# Now copy the rest of the application source files into the image.
+COPY ./ /app
 
-# Expose the port that the application listens on.
-EXPOSE 8080
-
-# Copy the start script
+# Make sure the start script is executable.
 COPY ./start.sh /app/start.sh
-
-# Make the start script executable
 RUN chmod +x /app/start.sh
 
-# Run the app using the start script
+# Run the application as a non-root user (this requires the user 'node' to exist in the image).
+USER node
+
+# Expose the port the application will be listening on.
+EXPOSE 8080
+
+# Use the start script to run the app.
 CMD ["/app/start.sh"]
