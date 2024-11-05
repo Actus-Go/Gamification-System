@@ -18,7 +18,7 @@ RUN npm install
 COPY . /app
 
 # Leverage npm cache if possible (cache mount for npm)
-RUN --mount=type=cache,id=s/npm-cache,target=/root/.npm npm install
+RUN --mount=type=cache,id=s/6cf39e7a-2394-4d4d-a6bb-ea01ce2b94c8-npm-cache,target=/root/.npm npm install
 
 # Run the application as a non-root user (important for security)
 USER node
