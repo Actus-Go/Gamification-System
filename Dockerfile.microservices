@@ -18,8 +18,8 @@ RUN npm install
 COPY ./ /app
 
 # Make sure the start script is executable.
-COPY ./start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+COPY ./start.sh ./
+RUN chmod +x ./start.sh
 
 # Run the application as a non-root user (this requires the user 'node' to exist in the image).
 USER node
