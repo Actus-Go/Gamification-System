@@ -1,59 +1,92 @@
-const clientModel = (client_id) => {
-    const model = `const { Schema } = require('mongoose');
+const playerModel = (clientObjectId) => {
+    return `const { Schema } = require('mongoose');
 const mongoose = require('mongoose');
 
-const playerFrom${client_id}Schema = new Schema({
-    playerId: {
-        type: String,
-        unique: true
-    },
-    points: {
-        type: Number,
-        default: 0
-    },
-    numberOfRedemPoints: {
-        type: Number,
-        default: 0
-    },
-    client: {
-        type: Schema.Types.ObjectId,
-        ref: "Client"
+const playerSchema = new Schema(
+    {
+        points: {
+            type: Number,
+            default: 0
+        },
+        numberOfRedeemPoints: {
+            type: Number,
+            default: 0
+       },
+   },
+   {
+        timestamps: true,
+        collection: 'players_${clientObjectId}'
+   }
+);
+
+playerSchema.index({ points: -1 });
+
+playerSchema.set('toJSON', {
+    transform: (doc) => {
+        return {
+            id: doc._id.toString(),
+            points: doc.points,
+            numberOfRedeemPoints: doc.numberOfRedeemPoints,
+        };
     }
+});
 
-}, { timestamps: true });
-playerFrom${client_id}Schema.index({points: -1});
-const PlayerFrom${client_id} = mongoose.model('PlayerFrom${client_id}', playerFrom${client_id}Schema);
-module.exports = PlayerFrom${client_id};
-`;
-    return model;
+const Player = mongoose.model('Player${clientObjectId}', playerSchema);
+
+module.exports = Player;`;
 };
 
-const trackerModel = (client_id) => {
-    const model = `const { Schema } = require('mongoose');
+const trackerModel = (clientObjectId) => {
+    return `const { Schema } = require('mongoose');
 const mongoose = require('mongoose');
 
-const playerTrackerSchema = new Schema({
-    Player: {
-        type: Schema.Types.ObjectId,
-        ref: "Client${client_id}"
+const trackerSchema = new Schema(
+    {
+        player: {
+            type: Schema.Types.ObjectId,
+            ref: 'Player${clientObjectId}'
+        },
+        categoryId: {
+            type: String,
+            required: true,
+        },
+        productId: {
+            type: String,
+            required: true,
+        },
+        points: {
+            type: Number,
+            required: true,
+        },
+        isPaidFromTotalPoints: {
+            type: Boolean,
+            required: true,
+        },
     },
-    numberOfPoints: {
-        type: Number,
-    },
-    category: String,
-    productId: String
-
-}, { timestamps: true });
-
-trackerSchema.index(category);
-const PlayerTracker = mongoose.model('PlayerTracker', playerTrackerSchema);
-module.exports = PlayerTracker;
-`;
-    return model;
+    { 
+        timestamps: true,
+        collection: 'trackers_${clientObjectId}',
+    }
+);
+    
+trackerSchema.index({ categoryId: 1 });
+    
+trackerSchema.set('toJSON', {
+    transform: (doc) => {
+        return {
+            id: doc._id.toString(),
+            playerId: doc.player.toString(),
+            productId: doc.productId,
+            categoryId: doc.categoryId,
+            points: doc.points,
+            isPaidFromTotalPoints: doc.isPaidFromTotalPoints,
+        };
+    }
+});
+    
+const Tracker = mongoose.model('Tracker${clientObjectId}', trackerSchema);
+    
+module.exports = Tracker;`;
 };
 
-
-
-
-
-module.exports = {clientModel, trackerModel};
+module.exports = { playerModel, trackerModel };
