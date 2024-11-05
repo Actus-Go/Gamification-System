@@ -16,7 +16,7 @@ WORKDIR /app
 # into this layer.
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,id=myapp/$(sha256sum package-lock.json | cut -d ' ' -f1),target=/root/.npm \
+    --mount=type=cache,id=s/npm-cache,target=/root/.npm \
     npm ci
 
 
