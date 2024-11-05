@@ -14,7 +14,7 @@ WORKDIR /app
 # Leverage a cache mount to /root/.npm to speed up subsequent builds.
 # Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
 # into this layer.
-RUN --mount=type=cache,id=s/6cf39e7a-2394-4d4d-a6bb-ea01ce2b94c8/root/.npm,target=/root/.npm npm install
+RUN --mount=type=cache,id=s/6cf39e7a-2394-4d4d-a6bb-ea01ce2b94c8-cache,target=/root/.npm npm install
 
 
 
