@@ -1,6 +1,6 @@
 [build]
 builder = "DOCKERFILE"
-dockerfilePath = "/MicroServices/Dockerfile.microservices"
+dockerfilePath = "./MicroServices/Dockerfile.microservices"
 
 [environments.production.deploy]
 startCommand = "npm run auth-service & npm run points-service & npm run main-service"
